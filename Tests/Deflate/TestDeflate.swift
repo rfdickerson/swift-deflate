@@ -34,6 +34,28 @@ class TestDeflate : XCTestCase {
         
     }
     
+    func testDeflate2() {
+        
+        let input: [Byte] = [0x80, 0x80, 0x40, 0x80, 0x80]
+        
+        let output = deflate(buffer: input)
+        
+        var correct = [Output]()
+        correct.append( .value(0x80))
+        correct.append( .value(0x80))
+        correct.append( .value(0x40))
+        correct.append( .reference(Reference(length: 2, distance: 3)))
+        correct.append( .value(0x40))
+        
+        XCTAssertEqual(output.count, correct.count)
+        
+       
+        print (output)
+        //
+        
+    }
+
+    
     /**
     * Should return a reference (1, 4)
     *
