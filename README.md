@@ -1,3 +1,9 @@
 # PureCompression
 
-A Pure-Swift implementation of common compression algorithms
+> PureCompression is a pure Swift implementation of common compression algorithms
+
+# Features
+
+    - [ ] LZ77
+    - [ ] Deflate
+    
