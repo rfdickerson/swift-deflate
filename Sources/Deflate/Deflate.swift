@@ -23,6 +23,12 @@ enum Output {
     case empty
 }
 
+extension Output: Equatable {}
+
+func ==(lhs: Output, rhs: Output) -> Bool {
+    return true
+}
+
 let input: [Byte] = [0x80, 0x23, 0x80, 0x23]
 
 var window = [Byte](repeating: 0x00, count: 32768)
@@ -81,27 +87,28 @@ func findLongestSubstring(index: Int, buffer: [Byte]) -> Reference? {
 }
 
 
-func deflate () {
-    for i in input {
+func deflate (buffer: [Byte]) -> [Output] {
     
-    // add current element to sliding window
-    // check if it's in the window
-    // if not, write to output
-    // if it is, write reference to output
-    window[index] = i
+    var output = [Output]()
     
-    // let reference = find(window, )
-    
-    output[index] = .reference( Reference( length: 8, distance: 3 ) )
-    
-    index += 1
-    outputIndex += 1
-    
-    
+    var cursor = 0
+    while cursor < buffer.count {
+        
+        // try to obtain a back reference
+        let reference = findLongestSubstring(index: cursor, buffer: buffer)
+        
+        if let reference = reference {
+            output.append(.reference(reference))
+            cursor += Int(reference.length) - Int(reference.distance)
+        } else {
+            output.append(.value(buffer[cursor]))
+        }
+        
+        // slide view forward
+        cursor += 1
     }
-
-    print(window)
-
-    print("Output is \(output)")
+    
+    return output
+    
 
 }

@@ -8,13 +8,29 @@ class TestDeflate : XCTestCase {
     
     static var allTests: [(String, TestDeflate -> () throws -> Void)] {
         return [
-                   ("testDeflate", testDeflate)
+                   ("testDeflate", testDeflate),
+                   ("testFindLongestSubstring", testFindLongestSubstring)
         ]
     }
     
     func testDeflate() {
         
-        deflate()
+        let input: [Byte] = [0x80, 0x80, 0x80, 0x80, 0x40]
+        
+        let output = deflate(buffer: input)
+        
+        var correct = [Output]()
+        correct.append( .value(0x80) )
+        correct.append( .reference(Reference(length: 3, distance: 1)))
+        correct.append( .value(0x40))
+        
+        XCTAssertEqual(output.count, correct.count)
+        
+        for i in 0...output.count-1 {
+            XCTAssertEqual(output[i], correct[i])
+        }
+        print (output)
+        //
         
     }
     
