@@ -5,8 +5,8 @@ struct Block {
 typealias Byte = UInt8
 
 struct Reference {
-    var length: UInt8
-    var distance: UInt16
+    var length: Int
+    var distance: Int
 }
 
 extension Reference: Equatable {}
@@ -29,15 +29,7 @@ func ==(lhs: Output, rhs: Output) -> Bool {
     return true
 }
 
-let input: [Byte] = [0x80, 0x23, 0x80, 0x23]
 
-var window = [Byte](repeating: 0x00, count: 32768)
-var index = 0
-
-
-var outputIndex = 0
-
-var output = [Output](repeating: .empty, count: input.count)
 
 /**
  Finds a substring in the buffer
@@ -69,11 +61,12 @@ func findLongestSubstring(index: Int, buffer: [Byte]) -> Reference? {
                   buffer[cursor + numCharactersMatched] == buffer[index + numCharactersMatched] {
                 
                 numCharactersMatched+=1
+                
             }
             
             
             if numCharactersMatched > 2 {
-                return Reference(length: UInt8(numCharactersMatched), distance: UInt16(index-cursor))
+                return Reference(length: numCharactersMatched, distance: index-cursor)
             }
             
         }
@@ -99,7 +92,7 @@ func deflate (buffer: [Byte]) -> [Output] {
         
         if let reference = reference {
             output.append(.reference(reference))
-            cursor += Int(reference.length) - Int(reference.distance)
+            cursor += Int(reference.length)
         } else {
             output.append(.value(buffer[cursor]))
         }
@@ -111,4 +104,25 @@ func deflate (buffer: [Byte]) -> [Output] {
     return output
     
 
+}
+
+func serialize( output: [Output]) -> [Byte] {
+    
+    var serializedOutput = [Byte]()
+    
+    for i in output {
+        switch i {
+        case .reference(let ref):
+            serializedOutput.append(UInt8(ref.length))
+            serializedOutput.append(UInt8((ref.distance & 0xFF00) >> 8))
+            serializedOutput.append(UInt8(ref.distance & 0x00FF))
+        case .value(let value):
+            serializedOutput.append(value)
+        case .empty:
+            break
+        }
+    }
+    
+    return serializedOutput
+    
 }

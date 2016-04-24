@@ -9,7 +9,8 @@ class TestDeflate : XCTestCase {
     static var allTests: [(String, TestDeflate -> () throws -> Void)] {
         return [
                    ("testDeflate", testDeflate),
-                   ("testFindLongestSubstring", testFindLongestSubstring)
+                   ("testFindLongestSubstring", testFindLongestSubstring),
+                   ("testDeflateOnBook", testDeflateOnBook)
         ]
     }
     
@@ -32,6 +33,31 @@ class TestDeflate : XCTestCase {
         print (output)
         //
         
+    }
+    
+    func testDeflateOnBook() {
+        let data = NSData(contentsOfFile: "/Users/Robert/swift-at-ibm/gzip-compression/data/simple.txt")
+        
+        var bytes = [Byte](repeating: 0x00, count: data!.length)
+        
+        data?.getBytes(&bytes, length: (data?.length)!)
+        
+        let output = deflate(buffer: bytes)
+        
+        let stream = serialize(output: output)
+        
+        let compressionRatio = Double(stream.count)/Double(bytes.count)
+        
+        print("Compression ratio \(compressionRatio)")
+        
+    }
+    
+    func testSerialize() {
+        let input: [Byte] = [0x80, 0x80, 0x80, 0x80, 0x40]
+        let output = deflate(buffer: input)
+        let serializedOutput = serialize(output: output)
+        
+        print(serializedOutput)
     }
     
     func testDeflate2() {
@@ -98,5 +124,20 @@ class TestDeflate : XCTestCase {
         
         XCTAssertNil(reference)
         
+    }
+    
+    func testFindLongestSubstring4() {
+        
+        let input: [Byte] = [0x01, 0x02, 0x03, 0x04, 0x02, 0x03, 0x04]
+        
+        let reference = findLongestSubstring(index: 4, buffer: input)
+        
+        XCTAssertNotNil(reference)
+        
+        let correct = Reference(length: 3, distance: 3)
+        
+        XCTAssertEqual(reference, correct)
+        
+        print(reference)
     }
 }
