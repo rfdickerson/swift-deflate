@@ -106,6 +106,34 @@ func deflate (buffer: [Byte]) -> [Output] {
 
 }
 
+func inflate (buffer: [Output]) -> [Byte] {
+    
+    var output = [Byte]()
+    
+    var index = 0
+    while index < buffer.count {
+        
+        let cursor = buffer[index]
+        
+        switch cursor {
+        case .empty:
+            break
+        case .reference(let reference):
+            for j in 0...reference.length {
+                
+                let newIndex = index - reference.distance + j
+                output.append(output[newIndex])
+            }
+        case .value(let value):
+            output.append(value)
+        }
+        
+        index += 1
+    }
+    
+    return output
+}
+
 func serialize( output: [Output]) -> [Byte] {
     
     var serializedOutput = [Byte]()

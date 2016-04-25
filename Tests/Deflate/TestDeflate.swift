@@ -35,8 +35,24 @@ class TestDeflate : XCTestCase {
         
     }
     
+    func testDeflateInflate() {
+        
+        let input: [Byte] = [0x80, 0x70, 0x60, 0x80, 0x70, 0x60]
+        
+        let output = deflate(buffer: input)
+        
+        let decompressed = inflate(buffer: output)
+        
+        XCTAssertNotNil(decompressed)
+        
+        print (decompressed)
+        
+        
+        
+    }
+    
     func testDeflateOnBook() {
-        let data = NSData(contentsOfFile: "/Users/Robert/swift-at-ibm/gzip-compression/data/simple.txt")
+        let data = NSData(contentsOfFile: "/Users/Robert/swift-at-ibm/gzip-compression/data/grinch.txt")
         
         var bytes = [Byte](repeating: 0x00, count: data!.length)
         
