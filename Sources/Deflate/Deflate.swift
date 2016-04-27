@@ -110,11 +110,12 @@ func deflate (_ buffer: [Byte]) -> [Output] {
 func inflate (buffer: [Output]) -> [Byte] {
     
     var output = [Byte]()
-    
+
     var index = 0
     while index < buffer.count {
         
         let cursor = buffer[index]
+        let outputIndex = output.count
         
         switch cursor {
         case .empty:
@@ -122,7 +123,7 @@ func inflate (buffer: [Output]) -> [Byte] {
         case .reference(let reference):
             for j in 0...reference.length-1 {
                 
-                let newIndex = index - reference.distance + j
+                let newIndex = outputIndex - reference.distance + j
                 output.append(output[newIndex])
             }
         case .value(let value):
