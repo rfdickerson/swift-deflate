@@ -36,7 +36,7 @@ func ==(lhs: Output, rhs: Output) -> Bool {
  
  - returns: Reference
 */
-func findLongestSubstring(index: Int, buffer: [Byte]) -> Reference? {
+func findLongestSubstring( index: Int, buffer: [Byte]) -> Reference? {
     
     // find a substring that matches up to a part that can't be matched any longer
     assert(index >= 0 && index < buffer.count)
@@ -80,7 +80,7 @@ func findLongestSubstring(index: Int, buffer: [Byte]) -> Reference? {
 }
 
 
-func deflate (buffer: [Byte]) -> [Output] {
+func deflate (_ buffer: [Byte]) -> [Output] {
     
     var output = [Output]()
     
@@ -95,10 +95,11 @@ func deflate (buffer: [Byte]) -> [Output] {
             cursor += Int(reference.length)
         } else {
             output.append(.value(buffer[cursor]))
+            cursor += 1
         }
         
         // slide view forward
-        cursor += 1
+        
     }
     
     return output
@@ -119,7 +120,7 @@ func inflate (buffer: [Output]) -> [Byte] {
         case .empty:
             break
         case .reference(let reference):
-            for j in 0...reference.length {
+            for j in 0...reference.length-1 {
                 
                 let newIndex = index - reference.distance + j
                 output.append(output[newIndex])

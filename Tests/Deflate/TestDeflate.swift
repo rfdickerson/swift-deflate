@@ -18,19 +18,21 @@ class TestDeflate : XCTestCase {
         
         let input: [Byte] = [0x80, 0x80, 0x80, 0x80, 0x40]
         
-        let output = deflate(buffer: input)
+        let output = deflate(input)
         
         var correct = [Output]()
         correct.append( .value(0x80) )
         correct.append( .reference(Reference(length: 3, distance: 1)))
         correct.append( .value(0x40))
         
+        print (output)
+        
         XCTAssertEqual(output.count, correct.count)
         
         for i in 0...output.count-1 {
             XCTAssertEqual(output[i], correct[i])
         }
-        print (output)
+        
         //
         
     }
@@ -39,15 +41,13 @@ class TestDeflate : XCTestCase {
         
         let input: [Byte] = [0x80, 0x70, 0x60, 0x80, 0x70, 0x60]
         
-        let output = deflate(buffer: input)
+        let output = deflate(input)
         
         let decompressed = inflate(buffer: output)
         
         XCTAssertNotNil(decompressed)
         
-        print (decompressed)
-        
-        
+        XCTAssertEqual(input, decompressed)
         
     }
     
@@ -58,7 +58,7 @@ class TestDeflate : XCTestCase {
         
         data?.getBytes(&bytes, length: (data?.length)!)
         
-        let output = deflate(buffer: bytes)
+        let output = deflate(bytes)
         
         let stream = serialize(output: output)
         
@@ -68,9 +68,26 @@ class TestDeflate : XCTestCase {
         
     }
     
+//    func testDeflateInflateOnBook() {
+//        let data = NSData(contentsOfFile: "/Users/Robert/swift-at-ibm/gzip-compression/data/grinch.txt")
+//        
+//        var bytes = [Byte](repeating: 0x00, count: data!.length)
+//        
+//        data?.getBytes(&bytes, length: (data?.length)!)
+//        
+//        let output = deflate(bytes)
+//        
+//        let decompressed = inflate(buffer: output)
+//        
+//        XCTAssertNotNil(decompressed)
+//        
+//        XCTAssertEqual(bytes, decompressed)
+//        
+//    }
+    
     func testSerialize() {
         let input: [Byte] = [0x80, 0x80, 0x80, 0x80, 0x40]
-        let output = deflate(buffer: input)
+        let output = deflate(input)
         let serializedOutput = serialize(output: output)
         
         print(serializedOutput)
@@ -80,7 +97,7 @@ class TestDeflate : XCTestCase {
         
         let input: [Byte] = [0x80, 0x80, 0x40, 0x80, 0x80]
         
-        let output = deflate(buffer: input)
+        let output = deflate(input)
         
         var correct = [Output]()
         correct.append( .value(0x80))
