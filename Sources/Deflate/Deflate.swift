@@ -111,6 +111,11 @@ func findLongestSubstringFast( index: Int, buffer: [Byte], hashTable: [Byte: [In
     
     for matchIndex in matches {
         
+        // skip matches that are really far away 2^5 away
+        if index - matchIndex > 32000 {
+            break
+        }
+        
         var numCharactersMatched = 1
         
         // Stop when matching characters past the buffer size

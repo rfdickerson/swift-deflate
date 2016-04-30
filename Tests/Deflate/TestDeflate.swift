@@ -52,7 +52,7 @@ class TestDeflate : XCTestCase {
     }
     
     func testDeflateOnBook() {
-        let data = NSData(contentsOfFile: "/Users/Robert/swift-at-ibm/gzip-compression/data/simple.txt")
+        let data = NSData(contentsOfFile: "/Users/Robert/swift-at-ibm/gzip-compression/data/grinch.txt")
         
         var bytes = [Byte](repeating: 0x00, count: data!.length)
         
