@@ -52,7 +52,7 @@ class TestDeflate : XCTestCase {
     }
     
     func testDeflateOnBook() {
-        let data = NSData(contentsOfFile: "/Users/Robert/swift-at-ibm/gzip-compression/data/grinch.txt")
+        let data = NSData(contentsOfFile: "/Users/Robert/swift-at-ibm/gzip-compression/data/simple.txt")
         
         var bytes = [Byte](repeating: 0x00, count: data!.length)
         
@@ -114,6 +114,42 @@ class TestDeflate : XCTestCase {
         
     }
 
+    
+    /**
+    The following test will use a hashmap to more quickly find the substring
+    */
+    func testFindSubstringFast() {
+    
+        let input: [Byte] = [0x81, 0x82, 0x83, 0x81, 0x82, 0x83, 0x81]
+        
+        var hashMap = ByteLookup()
+        hashMap[0x81] = []
+        hashMap[0x81]!.append(0)
+        
+        hashMap[0x82] = []
+        hashMap[0x82]!.append(1)
+        
+        hashMap[0x83] = []
+        hashMap[0x83]!.append(2)
+        
+        let reference = findLongestSubstringFast(index: 3, buffer: input, hashTable: hashMap)
+        
+        XCTAssertNotNil(reference)
+        XCTAssertEqual(reference?.distance, 3)
+        XCTAssertEqual(reference?.length, 4)
+        
+        hashMap[0x81]!.append(3)
+        
+        let reference2 = findLongestSubstringFast(index: 4, buffer: input, hashTable: hashMap)
+        
+        XCTAssertNotNil(reference2)
+        XCTAssertEqual(reference2?.distance, 3)
+        XCTAssertEqual(reference2?.length, 3)
+
+        
+        print(reference)
+        
+    }
     
     /**
     * Should return a reference (1, 4)
