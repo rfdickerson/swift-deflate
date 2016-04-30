@@ -57,11 +57,40 @@ extension TrieNode {
             
         }
         
+        if currentNode != self {
+            currentNode.final = true
+        }
+        
         
     }
     
     func contains(bytes: [Byte]) -> Bool {
         
-        return true
+        var currentNode = self
+        
+        for byte in bytes {
+            
+            for child in currentNode.children {
+                
+                if child.value == byte {
+                    
+                    currentNode = child
+                    
+                } else {
+                    
+                    return false
+                }
+                
+            }
+            
+        }
+        
+        if currentNode.final == true {
+             return true
+        } else {
+            return false
+        }
+        
+       
     }
 }
