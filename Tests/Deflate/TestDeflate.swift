@@ -120,27 +120,26 @@ class TestDeflate : XCTestCase {
     */
     func testFindSubstringFast() {
     
+        let searchTrie = TrieNode()
+        
         let input: [Byte] = [0x81, 0x82, 0x83, 0x81, 0x82, 0x83, 0x81]
         
-        var hashMap = ByteLookup()
-        hashMap[0x81] = []
-        hashMap[0x81]!.append(0)
+        searchTrie.insert(bytes: [0x81, 0x82, 0x83], index: 0)
+        searchTrie.insert(bytes: [0x82, 0x83, 0x81], index: 1)
+        searchTrie.insert(bytes: [0x83, 0x81, 0x82], index: 2)
+        searchTrie.insert(bytes: [0x81, 0x82, 0x83], index: 3)
+        searchTrie.insert(bytes: [0x82, 0x83, 0x81], index: 4)
+        searchTrie.insert(bytes: [0x83, 0x81], index: 5)
+        searchTrie.insert(bytes: [0x81], index: 6)
         
-        hashMap[0x82] = []
-        hashMap[0x82]!.append(1)
-        
-        hashMap[0x83] = []
-        hashMap[0x83]!.append(2)
-        
-        let reference = findLongestSubstringFast(index: 3, buffer: input, hashTable: hashMap)
+        let reference = findLongestSubstringFast(index: 3, buffer: input, searchTrie: searchTrie)
         
         XCTAssertNotNil(reference)
         XCTAssertEqual(reference?.distance, 3)
         XCTAssertEqual(reference?.length, 4)
         
-        hashMap[0x81]!.append(3)
         
-        let reference2 = findLongestSubstringFast(index: 4, buffer: input, hashTable: hashMap)
+        let reference2 = findLongestSubstringFast(index: 4, buffer: input, searchTrie: searchTrie)
         
         XCTAssertNotNil(reference2)
         XCTAssertEqual(reference2?.distance, 3)

@@ -4,7 +4,7 @@ struct Block {
 
 typealias Byte = UInt8
 
-typealias ByteLookup = [Byte: [Int]]
+
 
 struct Reference {
     var length: Int
@@ -31,14 +31,19 @@ func ==(lhs: Output, rhs: Output) -> Bool {
     return true
 }
 
-func addIndex(to hashTable: inout ByteLookup, byte: Byte, index: Int) {
+// Grab subset
+func fetchSubset(index: Int, buffer: [Byte]) -> [Byte] {
     
-    if hashTable[byte] == nil {
-        hashTable[byte] = []
+    var toAdd = [Byte]()
+    var i = index
+    while i < buffer.count && i-index < 3 {
+        toAdd.append( buffer[i] )
+        i+=1
     }
     
-    hashTable[byte]!.append(index)
+    assert(toAdd.count <= 3)
     
+    return toAdd
 }
 
 /**
@@ -94,7 +99,7 @@ func findLongestSubstring( index: Int, buffer: [Byte]) -> Reference? {
  
  - returns: Reference
  */
-func findLongestSubstringFast( index: Int, buffer: [Byte], hashTable: [Byte: [Int]]) -> Reference? {
+func findLongestSubstringFast( index: Int, buffer: [Byte], searchTrie: TrieNode) -> Reference? {
     
     // find a substring that matches up to a part that can't be matched any longer
     assert(index >= 0 && index < buffer.count)
@@ -103,9 +108,20 @@ func findLongestSubstringFast( index: Int, buffer: [Byte], hashTable: [Byte: [In
         return nil
     }
     
-    let toMatch = buffer[index]
+    // set match from 0 to 3 characters
+    // let toMatch = Array(buffer[index...index+3])
+//    var toMatch = [Byte]()
+//    var i = index
+//    while i < buffer.count && i-index < 3 {
+//        toMatch.append( buffer[i] )
+//        i+=1
+//    }
     
-    guard let matches = hashTable[toMatch] else {
+    let toMatch = fetchSubset(index: index, buffer: buffer)
+    
+    let matches = searchTrie.contains(bytes: toMatch)
+    
+    guard matches != [] else {
         return nil
     }
     
@@ -153,23 +169,25 @@ func deflate (_ buffer: [Byte]) -> [Output] {
     
     var output = [Output]()
     
-    var hashMap = ByteLookup()
+    let searchTrie = TrieNode()
     
     // While the entire buffer has been processed.
     var cursor = 0
     while cursor < buffer.count {
         
         // Attempt to find a substring match in history
-        let reference = findLongestSubstringFast(index: cursor, buffer: buffer, hashTable: hashMap)
+        let reference = findLongestSubstringFast(index: cursor, buffer: buffer, searchTrie: searchTrie)
         
         if let reference = reference {
             output.append(.reference(reference))
             
-            // Add all of the symbols in the
+            // Add 3 symbols to the search tree
             for j in 0...reference.length {
                 let historicalIndex = cursor - reference.distance + j
-                let historicalByte = buffer[historicalIndex]
-                addIndex(to: &hashMap, byte: historicalByte, index: historicalIndex)
+                
+                let subset = fetchSubset(index: historicalIndex, buffer: buffer)
+                searchTrie.insert(bytes: subset, index: historicalIndex)
+                // addIndex(to: &hashMap, byte: historicalByte, index: historicalIndex)
             }
             
             cursor += Int(reference.length)
@@ -178,7 +196,9 @@ func deflate (_ buffer: [Byte]) -> [Output] {
             
             output.append(.value(buffer[cursor]))
             
-            addIndex(to: &hashMap, byte: buffer[cursor], index: cursor)
+            let subset = fetchSubset(index: cursor, buffer: buffer)
+            searchTrie.insert(bytes: subset, index: cursor)
+            // addIndex(to: &hashMap, byte: buffer[cursor], index: cursor)
             
             cursor += 1
         }

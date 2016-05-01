@@ -16,13 +16,14 @@ class TrieNode {
     
     var value: Byte?
     
+    var indices = [Int]()
     
     
 }
 
 extension TrieNode {
     
-    func insert(bytes: [Byte]) {
+    func insert(bytes: [Byte], index: Int) {
      
         var currentNode = self
         
@@ -57,14 +58,14 @@ extension TrieNode {
             
         }
         
-        if currentNode != self {
-            currentNode.final = true
-        }
+        currentNode.indices.append(index)
+        currentNode.final = true
+        
         
         
     }
     
-    func contains(bytes: [Byte]) -> Bool {
+    func contains(bytes: [Byte]) -> [Int] {
         
         var currentNode = self
         
@@ -78,7 +79,7 @@ extension TrieNode {
                     
                 } else {
                     
-                    return false
+                    // return false
                 }
                 
             }
@@ -86,9 +87,9 @@ extension TrieNode {
         }
         
         if currentNode.final == true {
-             return true
+             return currentNode.indices
         } else {
-            return false
+            return []
         }
         
        
